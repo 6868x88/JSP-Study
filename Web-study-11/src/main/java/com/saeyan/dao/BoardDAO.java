@@ -16,15 +16,14 @@ public class BoardDAO {
 	private BoardDAO() {
 
 	}
+
 	private static BoardDAO instance = new BoardDAO();
 
 	public static BoardDAO getInstance() {
 		return instance;
 	}
 
-
-	//DB목록 불러오기
-	public List<BoardVO> selectAllBoards(){
+	public List<BoardVO> selectAllBoards() {
 		String sql = "select * from bboard order by num desc";
 
 		List<BoardVO> list = new ArrayList<BoardVO>();
@@ -32,25 +31,25 @@ public class BoardDAO {
 		Statement stmt = null;
 		ResultSet rs = null;
 
-
 		try {
 			conn = DBManager.getConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
 
+			while (rs.next()) {
+				BoardVO bVo = new BoardVO();
+				bVo.setNum(rs.getInt("num"));
+				bVo.setName(rs.getString("name"));
+				bVo.setEmail(rs.getString("email"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setContent(rs.getString("content"));
+				bVo.setReadcount(rs.getInt("readcount"));
+				bVo.setWritedate(rs.getTimestamp("writedate"));
 
-			while(rs.next()) {
-				BoardVO vo = new BoardVO();
-				vo.setNum(rs.getInt("num"));
-				vo.setName(rs.getString("name"));
-				vo.setEmail(rs.getString("email"));
-				vo.setPass(rs.getString("pass"));
-				vo.setTitle(rs.getString("title"));
-				vo.setContent(rs.getString("content"));
-				vo.setReadcount(rs.getInt("readcount"));
-				vo.setWritedate(rs.getTimestamp("writedate"));
+				list.add(bVo);
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBManager.close(conn, stmt, rs);
@@ -59,11 +58,9 @@ public class BoardDAO {
 		return list;
 	}
 
-	//DB입력
-	public void insertBoard(BoardVO vo) {
-		String sql = "insert into bboard("
-				+ "num, name, email, pass, title, content) "
-				+ "values(board_seq.NEXTVAL, ?, ? ,? ,? ,?)";
+	public void insertBoard(BoardVO bVo) {
+		String sql = "insert into bboard(" + "num, name, email, pass, title, content) "
+				+ "values(board_seq.nextval, ?, ?, ?, ?, ?)";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -72,25 +69,22 @@ public class BoardDAO {
 			conn = DBManager.getConnection();
 			pstmt = conn.prepareStatement(sql);
 
-			pstmt.setString(1, vo.getName());
-			pstmt.setString(2, vo.getEmail());
-			pstmt.setString(3, vo.getPass());
-			pstmt.setString(4, vo.getTitle());
-			pstmt.setString(5, vo.getContent());
+			pstmt.setString(1, bVo.getName());
+			pstmt.setString(2, bVo.getEmail());
+			pstmt.setString(3, bVo.getPass());
+			pstmt.setString(4, bVo.getTitle());
+			pstmt.setString(5, bVo.getContent());
 
 			pstmt.executeUpdate();
-
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBManager.close(conn, pstmt);
 		}
 	}
 
-
-	//조회수 증가
 	public void updateReadCount(String num) {
-		String  sql = "update bboard set readcount = readcount+1 where num=?";
+		String sql = "update bboard set readcount=readcount+1 where num=?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -101,7 +95,6 @@ public class BoardDAO {
 			pstmt.setString(1, num);
 
 			pstmt.executeUpdate();
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -109,11 +102,10 @@ public class BoardDAO {
 		}
 	}
 
-	//게시글 확인
 	public BoardVO selectOneBoardByNum(String num) {
 		String sql = "select * from bboard where num = ?";
 
-		BoardVO vo = null;
+		BoardVO bVo = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -125,28 +117,28 @@ public class BoardDAO {
 
 			rs = pstmt.executeQuery();
 
-			if(rs.next()) {
-				vo = new BoardVO();
+			if (rs.next()) {
+				bVo = new BoardVO();
 
-				vo.setNum(rs.getInt("num"));
-				vo.setName(rs.getString("name"));
-				vo.setPass(rs.getString("pass"));
-				vo.setEmail(rs.getString("email"));
-				vo.setContent(rs.getString("title"));
-				vo.setContent(rs.getString("content"));
-				vo.setWritedate(rs.getTimestamp("writedate"));
-				vo.setReadcount(rs.getInt("readcount"));
+				bVo.setNum(rs.getInt("num"));
+				bVo.setName(rs.getString("name"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setEmail(rs.getString("email"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setContent(rs.getString("content"));
+				bVo.setWritedate(rs.getTimestamp("writedate"));
+				bVo.setReadcount(rs.getInt("readcount"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			DBManager.close(conn, pstmt, rs);
 		}
-		return vo;
+		return bVo;
 	}
 
-	public void updateBoard(BoardVO vo) {
-		String sql =  "update bboard set name=?, email=?, pass=?, "+"title=?, content=? where num=?";
+	public void updateBoard(BoardVO bVo) {
+		String sql = "update bboard set name=?, email=?, pass=?, " + "title=?, content=? where num=?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -155,29 +147,28 @@ public class BoardDAO {
 			conn = DBManager.getConnection();
 			pstmt = conn.prepareStatement(sql);
 
-			pstmt.setString(1, vo.getName());
-			pstmt.setString(2, vo.getEmail());
-			pstmt.setString(3, vo.getPass());
-			pstmt.setString(4, vo.getTitle());
-			pstmt.setString(5, vo.getContent());
-			pstmt.setInt(6, vo.getNum());
+			pstmt.setString(1, bVo.getName());
+			pstmt.setString(2, bVo.getEmail());
+			pstmt.setString(3, bVo.getPass());
+			pstmt.setString(4, bVo.getTitle());
+			pstmt.setString(5, bVo.getContent());
+			pstmt.setInt(6, bVo.getNum());
 
-		} catch (Exception e) {
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			DBManager.close(conn, pstmt);
 		}
-
 	}
 
-	//비밀번호 확인 - 수정/삭제 권한
 	public BoardVO checkPassWord(String pass, String num) {
-		String sql = "select * from bboard where pass=? ane num=?";
+		String sql = "select * from bboard where pass=? and num=?";
 
-		BoardVO vo = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		BoardVO bVo = null;
 
 		try {
 			conn = DBManager.getConnection();
@@ -187,41 +178,35 @@ public class BoardDAO {
 			pstmt.setString(2, num);
 			rs = pstmt.executeQuery();
 
-			if(rs.next()) {
-				vo = new BoardVO();
+			if (rs.next()) {
+				bVo = new BoardVO();
 
-				vo.setNum(rs.getInt("num"));
-				vo.setName(rs.getString("name"));
-				vo.setEmail(rs.getString("email"));
-				vo.setPass(rs.getString("pass"));
-				vo.setContent(rs.getString("title"));
-				vo.setContent(rs.getString("content"));
-				vo.setWritedate(rs.getTimestamp("writedate"));
-				vo.setReadcount(rs.getInt("readcount"));
+				bVo.setNum(rs.getInt("num"));
+				bVo.setName(rs.getString("name"));
+				bVo.setEmail(rs.getString("email"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setContent(rs.getString("content"));
+				bVo.setReadcount(rs.getInt("readcount"));
+				bVo.setWritedate(rs.getTimestamp("writedate"));
 			}
-
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
-			DBManager.close(conn, pstmt, rs);
 		}
-		return vo;
+		return bVo;
 	}
-	
-	//삭제
+
 	public void deleteBoard(String num) {
-		String sql = "delete bboard where num =?";
-		
+		String sql = "delete bboard where num=?";
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		
+
 		try {
 			conn = DBManager.getConnection();
 			pstmt = conn.prepareStatement(sql);
-			
 			pstmt.setString(1, num);
 			pstmt.executeUpdate();
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

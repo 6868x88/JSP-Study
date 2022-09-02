@@ -11,21 +11,19 @@ import javax.servlet.http.HttpServletResponse;
 import com.saeyan.dao.BoardDAO;
 import com.saeyan.dto.BoardVO;
 
-public class BoardListAction  implements Action{
+public class BoardListAction implements Action {
 
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void execute(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String url = "/board/boardList.jsp";
-		
-		BoardDAO dao = BoardDAO.getInstance();
-		List<BoardVO> boardList = dao.selectAllBoards();
+
+		BoardDAO bDao = BoardDAO.getInstance();
+		List<BoardVO> boardList = bDao.selectAllBoards();
 		request.setAttribute("boardList", boardList);
-		
+
 		RequestDispatcher dispatcher = request.getRequestDispatcher(url);
 		dispatcher.forward(request, response);
-		
 	}
-	
-
 }
