@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" type="text/css" href="css/shopping.css">
+<link rel="stylesheet" type="text/css" href="css/expand_style.css">
 <script type="text/javascript" src="script/board.js"></script>
 <title>게시판</title>
 </head>
