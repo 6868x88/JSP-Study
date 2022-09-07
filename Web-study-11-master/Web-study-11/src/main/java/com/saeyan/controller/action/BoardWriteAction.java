@@ -13,20 +13,17 @@ public class BoardWriteAction implements Action {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		BoardVO bVo = new BoardVO();
 		
-		BoardVO vo = new BoardVO();
-		vo.setName(request.getParameter("name"));
-		vo.setPass(request.getParameter("pass"));
-		vo.setEmail(request.getParameter("email"));
-		vo.setTitle(request.getParameter("title"));
-		vo.setContent(request.getParameter("content"));
+		bVo.setName(request.getParameter("name"));
+		bVo.setPass(request.getParameter("pass"));
+		bVo.setEmail(request.getParameter("email"));
+		bVo.setTitle(request.getParameter("title"));
+		bVo.setContent(request.getParameter("content"));
 		
-		BoardDAO dao = BoardDAO.getInstance();
-		dao.insertBoard(vo);
+		BoardDAO bDao = BoardDAO.getInstance();
+		bDao.insertBoard(bVo);
 		
 		new BoardListAction().execute(request, response);
-		
 	}
-
 }
